@@ -15,7 +15,9 @@ USAGE EXAMPLE:
 		EXEC bronze.load_bronze @file_path = 'C:\YOUR_PATH\Amazon Sale Report.csv' ;
 ==================================================================
 */
-
+USE DataWareHouse
+GO
+	
 CREATE OR ALTER PROCEDURE bronze.load_bronze
 	@file_path NVARCHAR(MAX) -- Take file path from outside
 AS	

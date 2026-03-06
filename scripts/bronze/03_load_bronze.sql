@@ -28,6 +28,7 @@ BEGIN
 	SET @start_time = GETDATE();
 		-- Truncate old data of table
 		TRUNCATE TABLE bronze.amazon_sales_report;
+		PRINT '==> Table is truncated: bronze.amazon_sales_report'
 		-- If there is a view delete it
 		IF OBJECT_ID('bronze.vw_amazon_sales_report', 'V') IS NOT NULL
 		BEGIN

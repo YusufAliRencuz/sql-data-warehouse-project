@@ -43,7 +43,10 @@ asin VARCHAR(10),
 courier_status VARCHAR(15),
 qty INT,
 currency VARCHAR(3),
-amount DECIMAL(12,2)
+amount DECIMAL(12,2),
+ship_city VARCHAR(100),
+ship_state VARCHAR(50),
+ship_postal_code INT
 );
 GO
 PRINT '==> New silver layer table has been created';

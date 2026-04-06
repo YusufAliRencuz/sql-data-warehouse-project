@@ -314,7 +314,63 @@ SELECT
 amount
 FROM silver.amazon_sales_report WHERE amount IS NULL
 
+/*
+================================================================
+*/
+
+-- COLUMN ship_city
+-- Check for standardization
+SELECT 
+DISTINCT(ship_city)
+FROM silver.amazon_sales_report
+
+-- Check for nulls
+SELECT
+ship_city
+FROM silver.amazon_sales_report WHERE ship_city IS NULL
+
+-- Check unwanted spaces
+SELECT 
+ship_city
+FROM silver.amazon_sales_report WHERE ship_city != TRIM(ship_city)
+
 
 /*
 ================================================================
 */
+-- COLUMN ship_state
+-- Check for standardization
+SELECT 
+DISTINCT(ship_state)
+FROM silver.amazon_sales_report
+
+-- Check for nulls
+SELECT
+ship_state
+FROM silver.amazon_sales_report WHERE ship_state IS NULL
+
+-- Check unwanted spaces
+SELECT 
+ship_state
+FROM silver.amazon_sales_report WHERE ship_state != TRIM(ship_state)
+
+
+/*
+================================================================
+*/
+-- COLUMN ship_postal_code
+-- Check whether is any records in raw data shouldn't be converted to integer
+SELECT 
+    COUNT(*) AS Hatali_Kayit_Sayisi
+FROM bronze.amazon_sales_report
+WHERE ship_postal_code LIKE '%.[1-9]%' OR ship_postal_code LIKE '%[^0-9.]%'
+
+-- Check for negative numbers except of 'fault value'
+SELECT 
+ship_postal_code
+FROM silver.amazon_sales_report WHERE ship_postal_code < 0 AND ship_postal_code != -1
+
+-- Check for nulls
+SELECT
+ship_postal_code
+FROM silver.amazon_sales_report WHERE ship_postal_code IS NULL

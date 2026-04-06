@@ -47,7 +47,10 @@ BEGIN
 		courier_status,
 		qty,
 		currency,
-		amount
+		amount,
+		ship_city,
+		ship_state,
+		ship_postal_code
 		)
 		SELECT 
 		ISNULL(TRY_CAST(TRIM(index_id) AS INT), -1) AS index_id,
@@ -59,23 +62,29 @@ BEGIN
 			ELSE TRY_CONVERT(DATE ,order_date, 10)
 		END AS order_date,
 		CASE 
-			WHEN LOWER(status) LIKE '%shipping%' THEN 'shipped'
-			WHEN LOWER(status) LIKE '%returning%' THEN 'shipped - returned to seller'
+			WHEN LOWER(status COLLATE Latin1_General_CS_AS) LIKE '%shipping%' THEN 'shipped'
+			WHEN LOWER(status COLLATE Latin1_General_CS_AS) LIKE '%returning%' THEN 'shipped - returned to seller'
 			WHEN status IS NULL THEN 'n/a'
-			ELSE LOWER(TRIM(status))
+			ELSE LOWER(TRIM(status) COLLATE Latin1_General_CS_AS)
 		END AS status,
-		LOWER(TRIM(fulfilment)) AS fulfilment,
-		LOWER(TRIM(sales_channel)) AS sales_channel,
-		LOWER(TRIM(ship_service_level)) AS ship_service_level,
-		UPPER(TRIM(style)) AS style,
-		UPPER(TRIM(sku)) AS sku,
-		LOWER(TRIM(category)) AS category,
-		UPPER(TRIM(size)) AS size,
-		UPPER(TRIM(asin)) AS asin,
-		ISNULL(LOWER(TRIM(courier_status)), 'n/a') AS courier_status,
+		LOWER(TRIM(fulfilment) COLLATE Latin1_General_CS_AS) AS fulfilment,
+		LOWER(TRIM(sales_channel) COLLATE Latin1_General_CS_AS) AS sales_channel,
+		LOWER(TRIM(ship_service_level) COLLATE Latin1_General_CS_AS) AS ship_service_level,
+		UPPER(TRIM(style) COLLATE Latin1_General_CS_AS) AS style,
+		UPPER(TRIM(sku) COLLATE Latin1_General_CS_AS) AS sku,
+		LOWER(TRIM(category) COLLATE Latin1_General_CS_AS) AS category,
+		UPPER(TRIM(size) COLLATE Latin1_General_CS_AS) AS size,
+		UPPER(TRIM(asin) COLLATE Latin1_General_CS_AS) AS asin,
+		ISNULL(LOWER(TRIM(courier_status) COLLATE Latin1_General_CS_AS), 'n/a') AS courier_status,
 		ISNULL(TRY_CAST(TRIM(qty) AS INT), -1) AS qty,
-		ISNULL(UPPER(TRIM(currency)), 'n/a') AS currency,
-		ISNULL(TRY_CONVERT(DECIMAL(12,2), TRIM(amount)), -1) AS amount
+		ISNULL(UPPER(TRIM(currency) COLLATE Latin1_General_CS_AS), 'n/a') AS currency,
+		ISNULL(TRY_CONVERT(DECIMAL(12,2), TRIM(amount)), -1) AS amount,
+		ISNULL(TRIM(LOWER(ship_city) COLLATE Latin1_General_CS_AS), 'n/a') AS ship_city,
+		ISNULL(TRIM(LOWER(ship_state) COLLATE Latin1_General_CS_AS), 'n/a') AS ship_city,
+		CASE 
+			WHEN ship_postal_code NOT LIKE '%.[1-9]%' THEN CAST(CAST(ship_postal_code AS FLOAT) AS INT)
+			ELSE -1
+		END AS ship_postal_code
 		FROM(
 		SELECT 
 		*,

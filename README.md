@@ -13,12 +13,13 @@
 - **The Solution:** I implemented an abstraction with using `SQL VIEW`. By mapping the only  columns which CSV file has to the view, I enabled to use bulk insert.
 
 ## SILVER LAYER 🥈 ##
-- (in development)
 - => The goal of this layer is transform raw data from bronze layer into clean, standardized and reliable data for analytical processing.
 - Quality checks script has been writing simultaneously with '05_load_silver.sql'.
 
 ### Implementation ###
 - **Schema Design:** Borders of types are selected according to max length of column instance. Using `VARCHAR()` to take up less space in memory.
+- **Data Normalization:** `promotion_ids` column had multiple comma-separated values. I created a new table for it to prevent data mess and allow advanced queries. The goal is fitting the 1NF rule.
+- **Idempotent Design:** Both DDL and Load scripts follow the idempotent principle. Tables are safely dropped/recreated in DDL and truncated before inserting in the Load process. This makes it safe to execute the scripts multiple times without causing errors or data duplication.
 
 ### Challenges ###
 **Key Challenges and Solutions:**

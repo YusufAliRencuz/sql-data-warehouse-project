@@ -1,6 +1,7 @@
 /*
+==========================================================================
 	CREATE STORE PROCEDURE: LOAD CLEANED AND FILTERED DATA TO SILVER LAYER
-=========================================================================
+==========================================================================
 DESCRIPTION:
 			Create a procedure to load cleaned data into silver layer
 		tables from bronze layer table.

@@ -1,7 +1,5 @@
 /*
 ================================================================
-WARNING: THIS SCRIPT ISN'T FINISHED YET
-================================================================
 			QUALITY CHECKS
 ================================================================
 PURPOSE: 
@@ -16,6 +14,12 @@ PURPOSE:
 */
 
 USE DataWareHouse
+
+/*
+==================================================================
+TABLE: silver.amazon_sales_report
+==================================================================
+*/
 
 -- COLUMN index_id
 -- Check for nulls and duplicates
@@ -314,6 +318,7 @@ SELECT
 amount
 FROM silver.amazon_sales_report WHERE amount IS NULL
 
+
 /*
 ================================================================
 */
@@ -338,6 +343,7 @@ FROM silver.amazon_sales_report WHERE ship_city != TRIM(ship_city)
 /*
 ================================================================
 */
+
 -- COLUMN ship_state
 -- Check for standardization
 SELECT 
@@ -354,10 +360,10 @@ SELECT
 ship_state
 FROM silver.amazon_sales_report WHERE ship_state != TRIM(ship_state)
 
-
 /*
 ================================================================
 */
+
 -- COLUMN ship_postal_code
 -- Check whether is any records in raw data shouldn't be converted to integer
 SELECT 
@@ -374,3 +380,86 @@ FROM silver.amazon_sales_report WHERE ship_postal_code < 0 AND ship_postal_code 
 SELECT
 ship_postal_code
 FROM silver.amazon_sales_report WHERE ship_postal_code IS NULL
+
+
+/*
+================================================================
+*/
+
+-- COLUMN ship_country
+-- Check for standardization
+SELECT 
+DISTINCT(ship_country)
+FROM silver.amazon_sales_report
+
+-- Check for nulls
+SELECT
+ship_country
+FROM silver.amazon_sales_report WHERE ship_country IS NULL
+
+-- Check unwanted spaces
+SELECT 
+ship_country
+FROM silver.amazon_sales_report WHERE ship_country != TRIM(ship_country)
+
+/*
+================================================================
+*/
+
+-- COLUMN b2b
+-- Check for standardization
+SELECT 
+DISTINCT(b2b)
+FROM silver.amazon_sales_report
+
+-- Check for nulls
+SELECT
+b2b
+FROM silver.amazon_sales_report WHERE b2b IS NULL
+
+-- Check unwanted spaces
+SELECT 
+b2b
+FROM silver.amazon_sales_report WHERE b2b != TRIM(b2b)
+
+/*
+================================================================
+*/
+
+-- COLUMN fulfilled_by
+-- Check for standardization
+SELECT 
+DISTINCT(fulfilled_by)
+FROM silver.amazon_sales_report
+
+-- Check for nulls
+SELECT
+fulfilled_by
+FROM silver.amazon_sales_report WHERE fulfilled_by IS NULL
+
+-- Check unwanted spaces
+SELECT 
+fulfilled_by
+FROM silver.amazon_sales_report WHERE fulfilled_by != TRIM(fulfilled_by)
+
+/*
+==================================================================
+TABLE: silver.amazon_sales_promotions
+==================================================================
+*/
+
+-- COLUMN promotion_id
+-- Check for standardization
+SELECT 
+DISTINCT(promotion_id)
+FROM silver.amazon_sales_promotions
+
+-- Check for nulls
+SELECT
+promotion_id
+FROM silver.amazon_sales_promotions WHERE promotion_id IS NULL
+
+-- Check unwanted spaces
+SELECT 
+promotion_id
+FROM silver.amazon_sales_promotions WHERE promotion_id != TRIM(promotion_id)

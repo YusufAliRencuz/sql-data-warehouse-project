@@ -1,5 +1,6 @@
 /*
 ==========================================================================
+
 	CREATE STORE PROCEDURE: LOAD CLEANED AND FILTERED DATA TO SILVER LAYER
 ==========================================================================
 DESCRIPTION:
@@ -24,6 +25,8 @@ BEGIN
 	DECLARE @start_time DATETIME, @end_time DATETIME; -- Create variable for metadata 
 	BEGIN TRY
 		SET @start_time = GETDATE();
+		
+		BEGIN TRAN;
 		
 		ALTER TABLE silver.amazon_sales_promotions DROP CONSTRAINT FK_Promotions_Sales; -- Drop Foreign Key constraint from silver.amazon_sales_promotions table
 		PRINT '==> Drop constraint from silver.amazon_sales_promotions table'
@@ -86,7 +89,7 @@ BEGIN
 		ISNULL(TRY_CAST(TRIM(qty) AS INT), -1) AS qty,
 		ISNULL(UPPER(TRIM(currency) COLLATE Latin1_General_CS_AS), 'n/a') AS currency,
 		ISNULL(TRY_CONVERT(DECIMAL(12,2), TRIM(amount)), -1) AS amount,
-		ISNULL(TRIM(LOWER(ship_city) COLLATE Latin1_General_CS_AS), 'n/a') AS ship_city,
+		ISNULL(TRIM(' .,' FROM LOWER(ship_city) COLLATE Latin1_General_CS_AS), 'n/a') AS ship_city,
 		ISNULL(TRIM(LOWER(ship_state) COLLATE Latin1_General_CS_AS), 'n/a') AS ship_state,
 		CASE 
 			WHEN ship_postal_code NOT LIKE '%.[1-9]%' THEN CAST(CAST(ship_postal_code AS FLOAT) AS INT)
@@ -112,7 +115,7 @@ BEGIN
 		TRIM(promo.value)
 		FROM silver.amazon_sales_report AS s
 		INNER JOIN bronze.amazon_sales_report as b
-			ON s.order_id = b.order_id
+			ON s.order_id = b.order_id AND s.sku = b.sku
 		CROSS APPLY STRING_SPLIT(b.promotion_ids, ',') AS promo
 		WHERE b.promotion_ids IS NOT NULL;
 		PRINT '==> Data have been inserted into tables';
@@ -124,9 +127,13 @@ BEGIN
 
 		SET @end_time = GETDATE()
 		PRINT '==> Elapsed time:' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + ' seconds';
+
+		COMMIT TRAN;
 	END TRY
 	BEGIN CATCH
-		PRINT '==> An error occured!' + ERROR_MESSAGE();
+		IF @@TRANCOUNT > 0
+			ROLLBACK TRAN;
+		PRINT '==> An error occurred. ' + ERROR_MESSAGE();
 	END CATCH
 END
 GO

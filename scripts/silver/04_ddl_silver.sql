@@ -16,13 +16,15 @@ WARNING:
 USE DataWareHouse
 GO
 
+BEGIN TRY
+BEGIN TRAN
+
 -- Drop promotions table if already exists
 IF OBJECT_ID('silver.amazon_sales_promotions', 'U') IS NOT NULL
 	BEGIN
 		DROP TABLE silver.amazon_sales_promotions
 		PRINT '==> Old silver layer promotions table has been deleted';
 	END
-GO
 
 -- Drop report table if already exist
 IF OBJECT_ID('silver.amazon_sales_report' , 'U') IS NOT NULL
@@ -30,7 +32,6 @@ IF OBJECT_ID('silver.amazon_sales_report' , 'U') IS NOT NULL
 		DROP TABLE silver.amazon_sales_report
 		PRINT '==> Old silver layer report table has been deleted';
 	END
-GO
 
 -- Create report table for silver layer
 CREATE TABLE silver.amazon_sales_report (
@@ -59,7 +60,6 @@ CREATE TABLE silver.amazon_sales_report (
 	fulfilled_by VARCHAR(15)
 );
 PRINT '==> New report table has been created in silver layer';
-GO
 
 -- Create promotions table for silver layer
 CREATE TABLE silver.amazon_sales_promotions (
@@ -69,4 +69,12 @@ CREATE TABLE silver.amazon_sales_promotions (
 	CONSTRAINT FK_Promotions_Sales FOREIGN KEY (sale_id) REFERENCES silver.amazon_sales_report (sale_id)
 );
 PRINT '==> New promotion table has been created in silver layer';
-GO
+
+
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRAN;
+	PRINT'==> An errror occurred. ' + ERROR_MESSAGE();
+END CATCH

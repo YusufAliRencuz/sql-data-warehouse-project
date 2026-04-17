@@ -1,6 +1,6 @@
 # sql-data-warehouse-project
 
-- => This project implements a Medallion Architecture to process and analyze Amazon sales data using SQL Server.
+=> This project implements a Medallion Architecture to process and analyze Amazon sales data using SQL Server.
 
 ## BRONZE LAYER 🥉 ##
 - => The goal of this layer is to store raw data with zero changes to ensure finding a copy of source data when it is needed.
@@ -27,3 +27,18 @@
 **Key Challenges and Solutions:**
 - **The Problem:** The status column contained inconsistent naming and hidden characters, causing standard `UPPER(TRIM())` functions to fail during normalization.
 - **The Solution:** Instead of exact matching, I used `SQL Wildcards (%)` and `LIKE` operators within a `CASE` statement. This allowed me to group varied strings into a standardized status category.
+
+## GOLD LAYER 🥇 ##
+- => The goal of this layer is to transform clean data from the silver layer into a Star Schema architecture to provide business-ready data for analytical and reporting tools.
+
+### Implementation ###
+- **Schema Design:** Built a Star Schema with one fact table (`fact_sales`) and three dimension tables (`dim_product`, `dim_location`, `dim_date`). Foreign Key constraints are established to maintain referential integrity.
+- **Surrogate & Smart Keys:** Converted business keys into Surrogate Keys (`INT IDENTITY`) for dimensions. Formatted dates into integer Smart Keys (e.g., 20220105) using `CAST` and `FORMAT` functions for faster `JOIN` operations.
+- **Constraint Toggling:** Implemented dynamic dropping and recreating of Foreign Keys during the load process to allow fast `TRUNCATE` operations without breaking data integrity.
+
+### Challenges ###
+**Key Challenges and Solutions:**
+- **The Problem:** Generating daily rows for the Date dimension using a `WHILE` loop between 2020-01-01 and 2022-12-31. It was quite inefficient and slow.
+- **The Solution:** I replaced the `WHILE` loop with a Recursive `CTE` (Common Table Expression). This optimization made the date generation process significantly more efficient.
+- **The Problem:** Joining location data to the fact table only by city, state, and country caused a massive row explosion (Cartesian Product) due to duplicate city names.
+- **The Solution:** I added `ship_postal_code` to the `LEFT JOIN` conditions to guarantee a 1:1 match and prevent duplicate rows.

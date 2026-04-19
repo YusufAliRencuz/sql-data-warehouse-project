@@ -2,6 +2,8 @@
 
 => This project implements a Medallion Architecture to process and analyze Amazon sales data using SQL Server.
 
+![Project Architecture](images/architecture_schema.drawio.png)
+
 ## BRONZE LAYER 🥉 ##
 - => The goal of this layer is to store raw data with zero changes to ensure finding a copy of source data when it is needed.
 
